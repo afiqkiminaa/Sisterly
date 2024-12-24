@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "470510445242",
+    "project_id": "sisterly-app",
+    "storage_bucket": "sisterly-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470510445242:android:87607373fe26e9cb8cd883",
+        "android_client_info": {
+          "package_name": "com.example.sisterlyapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBawE3C7LYqrNClliHXxmcmDtH7jGLO7pQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
