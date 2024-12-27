@@ -1,7 +1,6 @@
 package com.example.sisterlyapp;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,21 +15,21 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -50,7 +49,7 @@ public class SignupActivity extends AppCompatActivity {
 
         Toast.makeText(SignupActivity.this, "You can register now", Toast.LENGTH_LONG).show();
 
-        progressBar = findViewById(R.id.progressBar);
+        progressBar = findViewById(R.id.ProgressBar);
         editTextRegisterFullName = findViewById(R.id.ETFullName);
         editTextRegisterUsername = findViewById(R.id.ETUsername);
         editTextRegisterEmail = findViewById(R.id.ETEmail);
@@ -72,6 +71,13 @@ public class SignupActivity extends AppCompatActivity {
                 String textMobile = editTextRegisterMobile.getText().toString();
                 String textAgree;
 
+                //Validate Mobile Number using matcher and pattern (Regular Expression)
+                String mobileRegex = "[0][1][0-9]{8}";  //First no. can be {0} and second no. can be {1} and rest 8 numbers can be any number
+                Matcher mobileMatcher;
+                Pattern mobilePattern = Pattern.compile(mobileRegex);
+                mobileMatcher = mobilePattern.matcher(textMobile);
+
+
                 if (TextUtils.isEmpty(textFullName)){
                     Toast.makeText(SignupActivity.this, "Please enter your full name", Toast.LENGTH_LONG).show();;
                     editTextRegisterFullName.setError("Full Name is required");
@@ -85,24 +91,28 @@ public class SignupActivity extends AppCompatActivity {
                     editTextRegisterEmail.setError("Email is required");
                     editTextRegisterEmail.requestFocus();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()) {
-                    Toast.makeText(SignupActivity.this, "Please re-enter your email", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, "Please re-enter your email", Toast.LENGTH_LONG).show();
                     editTextRegisterEmail.setError("Valid email is required");
                     editTextRegisterEmail.requestFocus();
                 } else if (TextUtils.isEmpty(textPwd)) {
-                    Toast.makeText(SignupActivity.this, "Please enter your password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, "Please enter your password", Toast.LENGTH_LONG).show();
                     editTextRegisterPwd.setError("Password is required");
                     editTextRegisterPwd.requestFocus();
                 } else if (textPwd.length() < 6) {
-                    Toast.makeText(SignupActivity.this, "Password should be at least 6 characters", Toast.LENGTH_SHORT).show();
-                    editTextRegisterMobile.setError("Password is too weak");
-                    editTextRegisterMobile.requestFocus();
+                    Toast.makeText(SignupActivity.this, "Password should be at least 6 characters", Toast.LENGTH_LONG).show();
+                    editTextRegisterPwd.setError("Password is too weak");
+                    editTextRegisterPwd.requestFocus();
                 } else if (TextUtils.isEmpty(textMobile)) {
-                    Toast.makeText(SignupActivity.this, "Please enter your phone no.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, "Please enter your phone no.", Toast.LENGTH_LONG).show();
                     editTextRegisterMobile.setError("Phone no. is required");
                     editTextRegisterMobile.requestFocus();
                 } else if (textMobile.length() != 10) {
-                    Toast.makeText(SignupActivity.this, "Please re-enter your phone no.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, "Please re-enter your phone no.", Toast.LENGTH_LONG).show();
                     editTextRegisterMobile.setError("Phone no. should be 10 digits");
+                    editTextRegisterMobile.requestFocus();
+                } else if (!mobileMatcher.find()) {
+                    Toast.makeText(SignupActivity.this, "Please re-enter your phone no.", Toast.LENGTH_LONG).show();
+                    editTextRegisterMobile.setError("Mobile no. is not valid");
                     editTextRegisterMobile.requestFocus();
                 } else {
                     textAgree = radioButtonAgree.getText().toString();
@@ -115,6 +125,8 @@ public class SignupActivity extends AppCompatActivity {
     // User register using the credentials given
     private void registerUser (String textFullname, String textUsername, String textEmail, String textPwd, String textMobile){
         FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        //Create user profile
         auth.createUserWithEmailAndPassword(textEmail, textPwd).addOnCompleteListener(SignupActivity.this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
@@ -123,8 +135,12 @@ public class SignupActivity extends AppCompatActivity {
                             Toast.makeText(SignupActivity.this, "User registered successfully", Toast.LENGTH_LONG).show();
                             FirebaseUser firebaseUser = auth.getCurrentUser();
 
+                            //Update Display name of user
+                            UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(textFullname).build();
+                            firebaseUser.updateProfile(profileChangeRequest);
+
                             //Enter user data into the Firebase Realtime Database.
-                            ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(textFullname, textUsername,textMobile);
+                            ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(textUsername,textMobile);
 
                             //Extracting user reference from Database for "Registered Users"
                             DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
@@ -139,16 +155,17 @@ public class SignupActivity extends AppCompatActivity {
 
                                         Toast.makeText(SignupActivity.this, "User registered successfully. Please verify your email", Toast.LENGTH_LONG).show();
 
-//                                        //Open User profile after successful registration
-//                                        Intent intent = new Intent(SignupActivity.this, UserProfileActivity.class);
-//                                        //To prevent user from returning back to signup activity on pressing back button after registration
-//                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                                        startActivity(intent);
-//                                        finish();  // to close Signup Activity
-//                                    } else {
-//                                        Toast.makeText(SignupActivity.this, "User registered failed. Please try again", Toast.LENGTH_LONG).show();
-//                                        progressBar.setVisibility(View.GONE);
+                                        //Open User profile after successful registration
+                                        Intent intent = new Intent(SignupActivity.this, StartActivity.class);
+                                        //To prevent user from returning back to signup activity on pressing back button after registration
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                        finish();  // to close Signup Activity
+                                    } else {
+                                        Toast.makeText(SignupActivity.this, "User registered failed. Please try again", Toast.LENGTH_LONG).show();
                                     }
+                                    //Hide progressBar whether user register successful or failed
+                                    progressBar.setVisibility(View.GONE);
                                 }
                             });
 
@@ -157,7 +174,7 @@ public class SignupActivity extends AppCompatActivity {
                             try {
                                 throw task.getException();
                             } catch (FirebaseAuthWeakPasswordException e) {
-                                editTextRegisterPwd.setError("Your password is to weak, Kingly use a mix of alphabets, number and special character");
+                                editTextRegisterPwd.setError("Your password is to weak, Kindly use a mix of alphabets, number and special character");
                                 editTextRegisterPwd.requestFocus();
                             } catch (FirebaseAuthInvalidCredentialsException e){
                                 editTextRegisterPwd.setError("Your email is invalid or already used. Kindly re-enter.");
@@ -168,8 +185,9 @@ public class SignupActivity extends AppCompatActivity {
                             } catch (Exception e) {
                                 Log.e(TAG, e.getMessage());
                                 Toast.makeText(SignupActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                progressBar.setVisibility(View.GONE);
                             }
+                            //Hide progressBar whether user register successful or failed
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 });

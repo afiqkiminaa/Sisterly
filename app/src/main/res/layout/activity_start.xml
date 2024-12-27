@@ -15,7 +15,8 @@
         android:backgroundTint="#F46847"
         android:text="LOG IN"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icon" />
 
     <Button
         android:id="@+id/SignUpButton"
@@ -27,15 +28,16 @@
         android:text="SIGN UP"
         android:textColor="#020202"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icon" />
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="420dp"
         android:layout_height="545dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="88dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/app_icon" />
@@ -44,7 +46,7 @@
         android:id="@+id/AppTitle"
         android:layout_width="156dp"
         android:layout_height="38dp"
-        android:layout_marginTop="520dp"
+        android:layout_marginTop="560dp"
         android:fontFamily="serif"
         android:text="SISTERLY"
         android:textAlignment="center"

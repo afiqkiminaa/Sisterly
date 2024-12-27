@@ -168,7 +168,7 @@
         app:layout_constraintTop_toBottomOf="@+id/TVPassword" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/ProgressBar"
         android:layout_width="52dp"
         android:layout_height="58dp"
         android:elevation="10dp"
