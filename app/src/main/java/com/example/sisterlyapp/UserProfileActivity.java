@@ -1,142 +1,82 @@
 package com.example.sisterlyapp;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.example.sisterlyapp.databinding.ActivityUserProfileBinding;
+import com.example.sisterlyapp.utilities.Constants;
+import com.example.sisterlyapp.utilities.PreferenceManager;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.HashMap;
 
 public class UserProfileActivity extends AppCompatActivity {
 
-    private TextView textViewWelcome, textViewFullName, textViewEmail, textViewMobile;
-    private ProgressBar progressBar;
-    private String username, fullName, email, mobile;
-    private ImageView imageView;
-    private FirebaseAuth authProfile;
+    private ActivityUserProfileBinding binding;
+    private PreferenceManager preferenceManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_user_profile);
-
-        // Get the ActionBar
-        ActionBar actionBar = getSupportActionBar();
-
-        // Check if ActionBar is not null
-        if (actionBar != null) {
-            actionBar.setTitle("User Profile"); // Set your desired title
-        } else {
-            // Optional: Log a message or handle cases where ActionBar is not available
-            System.out.println("ActionBar is null. Ensure the theme supports ActionBar.");
-        }
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        textViewWelcome = findViewById(R.id.TVShowWelcome);
-        textViewFullName = findViewById(R.id.TVShowFullName);
-        textViewEmail = findViewById(R.id.TVShowEmail);
-        textViewMobile = findViewById(R.id.TVShowMobile);
-        progressBar = findViewById(R.id.ProgressBar);
-
-        authProfile = FirebaseAuth.getInstance();
-        FirebaseUser firebaseUser = authProfile.getCurrentUser();
-
-        if (firebaseUser == null){
-            Toast.makeText(UserProfileActivity.this, "Something went wrong! User's details are not available at the moment", Toast.LENGTH_SHORT).show();
-        } else {
-            checkIfEmailVerified(firebaseUser);
-            progressBar.setVisibility(View.VISIBLE);
-            showUserProfile(firebaseUser);
-        }
-    }
-    //Users coming to UserProfileActivity after successful registration
-    private void checkIfEmailVerified(FirebaseUser firebaseUser) {
-        if (!firebaseUser.isEmailVerified()){
-            showAlertDialog();
-        }
+        binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        preferenceManager = new PreferenceManager(getApplicationContext());
+        loadUserDetails();
+        getToken();
     }
 
-    private void showAlertDialog() {
-        //Setup the alert builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(UserProfileActivity.this);
-        builder.setTitle("Email not verified");
-        builder.setMessage("Please verify your email now. You can't login without email verification.");
-
-        //Open email apps if user click continue button
-        builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //to email app in new window and not within our app
-                startActivity(intent);
-            }
-        });
-
-        //Create the AlertDialog
-        AlertDialog alertDialog = builder.create();
-
-        //Show the AlertDialog
-        alertDialog.show();
+    private void loadUserDetails() {
+        binding.textName.setText(preferenceManager.getString(Constants.KEY_USERNAME));
+        binding.TVShowFullName.setText(preferenceManager.getString(Constants.KEY_NAME));
+        binding.TVShowEmail.setText(preferenceManager.getString(Constants.KEY_EMAIL));
+        binding.TVShowMobile.setText(preferenceManager.getString(Constants.KEY_MOBILE));
     }
 
-    private void showUserProfile(FirebaseUser firebaseUser) {
-        String userID = firebaseUser.getUid();
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
 
-        //Extracting User Reference from Database for "Registered Users"
-        DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
-        referenceProfile.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ReadWriteUserDetails readWriteUserDetails = snapshot.getValue(ReadWriteUserDetails.class);
-                if(readWriteUserDetails != null){
-                    username = readWriteUserDetails.username;
-                    fullName = firebaseUser.getDisplayName();
-                    email = firebaseUser.getEmail();
-                    mobile = readWriteUserDetails.mobile;
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this::updateToken);
+    }
 
-                    textViewWelcome.setText("Welcome, " + username + "!");
-                    textViewFullName.setText(fullName);
-                    textViewEmail.setText(email);
-                    textViewMobile.setText(mobile);
-                }
-                progressBar.setVisibility(View.GONE);
-            }
+    private void updateToken(String token) {
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        DocumentReference documentReference =
+                database.collection(Constants.KEY_COLLECTION_USERS).document(
+                        preferenceManager.getString(Constants.KEY_USER_ID)
+                );
+        documentReference.update(Constants.KEY_FCM_TOKEN, token)
+                .addOnFailureListener(e -> showToast("Unable to update token"));
+    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(UserProfileActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+    private void signOut() {
+        showToast("Signing out...");
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        DocumentReference documentReference =
+                database.collection(Constants.KEY_COLLECTION_USERS).document(
+                        preferenceManager.getString(Constants.KEY_USER_ID)
+                );
+        HashMap<String, Object> updates = new HashMap<>();
+        updates.put(Constants.KEY_FCM_TOKEN, FieldValue.delete());
+        documentReference.update(updates)
+                .addOnSuccessListener(unused -> {
+                    preferenceManager.clear();
+                    startActivity(new Intent(getApplicationContext(), StartActivity.class));
+                    finish();
+                })
+                .addOnFailureListener(e -> showToast("Unable to sign out"));
     }
 
     //Creating  ActionBar menu
@@ -146,14 +86,16 @@ public class UserProfileActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.common_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+
     //When any menu item is selected
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.menu_update_profile){
-            Intent intent = new Intent (UserProfileActivity.this, UpdateProfileActivity.class);
-            startActivity(intent);
+//        if (id == R.id.menu_update_profile){
+//            Intent intent = new Intent(UserProfileActivity.this, UpdateProfileActivity.class);
+//            startActivity(intent);
 //        } else if (id == R.id.menu_update_email) {
 //            Intent intent = new Intent (UserProfileActivity.this, UpdateEmailActivity.class);
 //            startActivity(intent);
@@ -165,9 +107,9 @@ public class UserProfileActivity extends AppCompatActivity {
 //        } else if (id == R.id.menu_delete_profile) {
 //            Intent intent = new Intent (UserProfileActivity.this, DeleteProfileActivity.class);
 //            startActivity(intent);
-        } else if (id == R.id.menu_log_out) {
-            authProfile.signOut();
-            Toast.makeText(UserProfileActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+//        }
+         if (id == R.id.menu_log_out) {
+            signOut();
             Intent intent = new Intent(UserProfileActivity.this, StartActivity.class);
 
             //Clear stack to prevent user coming back to UserProfileActivity on pressing back button after Logging out

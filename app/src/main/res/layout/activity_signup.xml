@@ -123,6 +123,7 @@
         android:layout_width="327dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:buttonTint="#E91E63"
         android:text="Agree to Photos's Terms of Service and Privacy Policy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

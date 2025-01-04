@@ -2,22 +2,20 @@ package com.example.sisterlyapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
+
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.sisterlyapp.databinding.ActivitySignupBinding;
+import com.example.sisterlyapp.utilities.Constants;
+import com.example.sisterlyapp.utilities.HashUtils;
+import com.example.sisterlyapp.utilities.PreferenceManager;
+import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -27,169 +25,122 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private EditText editTextRegisterFullName, editTextRegisterUsername, editTextRegisterEmail, editTextRegisterPwd,
-                     editTextRegisterMobile;
-    private ProgressBar progressBar;
-    private RadioButton radioButtonAgree;
-    private static final String TAG = "SignupActivity";
+    private ActivitySignupBinding binding;
+    private PreferenceManager preferenceManager;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_signup);
+        binding = ActivitySignupBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        preferenceManager = new PreferenceManager(getApplicationContext());
+        firebaseAuth = FirebaseAuth.getInstance();
+        setListeners();
+    }
 
-//        getSupportActionBar().setTitle("Register");
-
-        Toast.makeText(SignupActivity.this, "You can register now", Toast.LENGTH_LONG).show();
-
-        progressBar = findViewById(R.id.ProgressBar);
-        editTextRegisterFullName = findViewById(R.id.ETFullName);
-        editTextRegisterUsername = findViewById(R.id.ETUsername);
-        editTextRegisterEmail = findViewById(R.id.ETEmail);
-        editTextRegisterPwd = findViewById(R.id.ETPassword);
-        editTextRegisterMobile = findViewById(R.id.ETPhone);
-
-        radioButtonAgree = findViewById(R.id.RBAgreement);
-
-        Button buttonRegister = findViewById(R.id.BtnRegister);
-        buttonRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //Obtain the entered data
-                String textFullName = editTextRegisterFullName.getText().toString();
-                String textUsername = editTextRegisterUsername.getText().toString();
-                String textEmail = editTextRegisterEmail.getText().toString();
-                String textPwd = editTextRegisterPwd.getText().toString();
-                String textMobile = editTextRegisterMobile.getText().toString();
-                String textAgree;
-
-                //Validate Mobile Number using matcher and pattern (Regular Expression)
-                String mobileRegex = "[0][1][0-9]{8}";  //First no. can be {0} and second no. can be {1} and rest 8 numbers can be any number
-                Matcher mobileMatcher;
-                Pattern mobilePattern = Pattern.compile(mobileRegex);
-                mobileMatcher = mobilePattern.matcher(textMobile);
-
-
-                if (TextUtils.isEmpty(textFullName)){
-                    Toast.makeText(SignupActivity.this, "Please enter your full name", Toast.LENGTH_LONG).show();;
-                    editTextRegisterFullName.setError("Full Name is required");
-                    editTextRegisterFullName.requestFocus();
-                } else if (TextUtils.isEmpty(textUsername)) {
-                    Toast.makeText(SignupActivity.this, "Please enter your username", Toast.LENGTH_LONG).show();
-                    editTextRegisterUsername.setError("Username is required");
-                    editTextRegisterUsername.requestFocus();
-                } else if (TextUtils.isEmpty(textEmail)) {
-                    Toast.makeText(SignupActivity.this, "Please enter your email", Toast.LENGTH_LONG).show();
-                    editTextRegisterEmail.setError("Email is required");
-                    editTextRegisterEmail.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()) {
-                    Toast.makeText(SignupActivity.this, "Please re-enter your email", Toast.LENGTH_LONG).show();
-                    editTextRegisterEmail.setError("Valid email is required");
-                    editTextRegisterEmail.requestFocus();
-                } else if (TextUtils.isEmpty(textPwd)) {
-                    Toast.makeText(SignupActivity.this, "Please enter your password", Toast.LENGTH_LONG).show();
-                    editTextRegisterPwd.setError("Password is required");
-                    editTextRegisterPwd.requestFocus();
-                } else if (textPwd.length() < 6) {
-                    Toast.makeText(SignupActivity.this, "Password should be at least 6 characters", Toast.LENGTH_LONG).show();
-                    editTextRegisterPwd.setError("Password is too weak");
-                    editTextRegisterPwd.requestFocus();
-                } else if (TextUtils.isEmpty(textMobile)) {
-                    Toast.makeText(SignupActivity.this, "Please enter your phone no.", Toast.LENGTH_LONG).show();
-                    editTextRegisterMobile.setError("Phone no. is required");
-                    editTextRegisterMobile.requestFocus();
-                } else if (textMobile.length() != 10) {
-                    Toast.makeText(SignupActivity.this, "Please re-enter your phone no.", Toast.LENGTH_LONG).show();
-                    editTextRegisterMobile.setError("Phone no. should be 10 digits");
-                    editTextRegisterMobile.requestFocus();
-                } else if (!mobileMatcher.find()) {
-                    Toast.makeText(SignupActivity.this, "Please re-enter your phone no.", Toast.LENGTH_LONG).show();
-                    editTextRegisterMobile.setError("Mobile no. is not valid");
-                    editTextRegisterMobile.requestFocus();
-                } else {
-                    textAgree = radioButtonAgree.getText().toString();
-                    progressBar.setVisibility(View.VISIBLE);
-                    registerUser(textFullName, textUsername, textEmail, textPwd, textMobile);
-                }
+    private void setListeners() {
+        binding.BtnRegister.setOnClickListener(v -> {
+            if (isValidSignUpDetails()) {
+                signUp();
             }
         });
     }
-    // User register using the credentials given
-    private void registerUser (String textFullname, String textUsername, String textEmail, String textPwd, String textMobile){
-        FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        //Create user profile
-        auth.createUserWithEmailAndPassword(textEmail, textPwd).addOnCompleteListener(SignupActivity.this,
-                new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            Toast.makeText(SignupActivity.this, "User registered successfully", Toast.LENGTH_LONG).show();
-                            FirebaseUser firebaseUser = auth.getCurrentUser();
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
 
-                            //Update Display name of user
-                            UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(textFullname).build();
-                            firebaseUser.updateProfile(profileChangeRequest);
+    private void signUp() {
+        loading(true);
 
-                            //Enter user data into the Firebase Realtime Database.
-                            ReadWriteUserDetails writeUserDetails = new ReadWriteUserDetails(textUsername,textMobile);
+        String email = binding.ETEmail.getText().toString().trim();
+        String password = binding.ETPassword.getText().toString().trim();
 
-                            //Extracting user reference from Database for "Registered Users"
-                            DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
+        // Hash the password before creating the user
+        String hashedPassword = HashUtils.hashPassword(password, email);  // Using email as salt
 
-                            referenceProfile.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-
-                                    if (task.isSuccessful()) {
-                                        //Send Verification EMail
-                                        firebaseUser.sendEmailVerification();
-
-                                        Toast.makeText(SignupActivity.this, "User registered successfully. Please verify your email", Toast.LENGTH_LONG).show();
-
-                                        //Open User profile after successful registration
-                                        Intent intent = new Intent(SignupActivity.this, StartActivity.class);
-                                        //To prevent user from returning back to signup activity on pressing back button after registration
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                        finish();  // to close Signup Activity
-                                    } else {
-                                        Toast.makeText(SignupActivity.this, "User registered failed. Please try again", Toast.LENGTH_LONG).show();
-                                    }
-                                    //Hide progressBar whether user register successful or failed
-                                    progressBar.setVisibility(View.GONE);
-                                }
-                            });
-
-
+        // Create a user with email and hashed password
+        firebaseAuth.createUserWithEmailAndPassword(email, hashedPassword)
+                .addOnCompleteListener(task -> {
+                    loading(false);
+                    if (task.isSuccessful()) {
+                        // Save additional user details to Firestore with hashed password
+                        saveUserDetailsToFirestore(hashedPassword);
+                    } else {
+                        if (task.getException() != null) {
+                            showToast(task.getException().getMessage());
                         } else {
-                            try {
-                                throw task.getException();
-                            } catch (FirebaseAuthWeakPasswordException e) {
-                                editTextRegisterPwd.setError("Your password is to weak, Kindly use a mix of alphabets, number and special character");
-                                editTextRegisterPwd.requestFocus();
-                            } catch (FirebaseAuthInvalidCredentialsException e){
-                                editTextRegisterPwd.setError("Your email is invalid or already used. Kindly re-enter.");
-                                editTextRegisterPwd.requestFocus();
-                            } catch (FirebaseAuthUserCollisionException e) {
-                                editTextRegisterPwd.setError("User is already registered with this email. Use another email.");
-                                editTextRegisterPwd.requestFocus();
-                            } catch (Exception e) {
-                                Log.e(TAG, e.getMessage());
-                                Toast.makeText(SignupActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                            //Hide progressBar whether user register successful or failed
-                            progressBar.setVisibility(View.GONE);
+                            showToast("Registration failed. Please try again.");
                         }
                     }
                 });
     }
+
+    private void saveUserDetailsToFirestore(String hashedPassword) {
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        HashMap<String, Object> user = new HashMap<>();
+        user.put(Constants.KEY_NAME, binding.ETFullName.getText().toString());
+        user.put(Constants.KEY_USERNAME, binding.ETUsername.getText().toString());
+        user.put(Constants.KEY_EMAIL, binding.ETEmail.getText().toString());
+        user.put(Constants.KEY_PASSWORD, hashedPassword);  // Store the hashed password
+        user.put(Constants.KEY_MOBILE, binding.ETPhone.getText().toString());
+
+        database.collection(Constants.KEY_COLLECTION_USERS)
+                .add(user)
+                .addOnSuccessListener(documentReference -> {
+                    preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+                    preferenceManager.putString(Constants.KEY_USER_ID, documentReference.getId());
+                    preferenceManager.putString(Constants.KEY_NAME, binding.ETFullName.getText().toString());
+                    preferenceManager.putString(Constants.KEY_USERNAME, binding.ETUsername.getText().toString());
+                    preferenceManager.putString(Constants.KEY_EMAIL, binding.ETEmail.getText().toString());
+                    preferenceManager.putString(Constants.KEY_MOBILE, binding.ETPhone.getText().toString());
+
+                    Intent intent = new Intent(getApplicationContext(), StartActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                })
+                .addOnFailureListener(exception -> showToast(exception.getMessage()));
+    }
+
+    private Boolean isValidSignUpDetails() {
+        if (binding.ETFullName.getText().toString().trim().isEmpty()) {
+            showToast("Enter Fullname");
+            return false;
+        } else if (binding.ETUsername.getText().toString().trim().isEmpty()) {
+            showToast("Enter your Username");
+            return false;
+        } else if (binding.ETEmail.getText().toString().trim().isEmpty()) {
+            showToast("Enter your email");
+            return false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(binding.ETEmail.getText().toString()).matches()) {
+            showToast("Valid email is required");
+            return false;
+        } else if (binding.ETPassword.getText().toString().trim().isEmpty()) {
+            showToast("Enter your password");
+            return false;
+        } else if (binding.ETPhone.getText().toString().trim().isEmpty()) {
+            showToast("Enter your phone no.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void loading(Boolean isLoading) {
+        if (isLoading) {
+            binding.BtnRegister.setVisibility(View.INVISIBLE);
+            binding.ProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            binding.ProgressBar.setVisibility(View.INVISIBLE);
+            binding.BtnRegister.setVisibility(View.VISIBLE);
+        }
+    }
 }
+

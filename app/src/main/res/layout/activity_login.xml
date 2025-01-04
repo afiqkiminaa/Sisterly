@@ -23,7 +23,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="40dp"
         android:layout_marginTop="44dp"
-        android:text="Email or Username"
+        android:text="Email"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TVLogin" />
@@ -37,17 +37,17 @@
         android:text="Password"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ETEmailOrUsername" />
+        app:layout_constraintTop_toBottomOf="@+id/inputEmail" />
 
     <EditText
-        android:id="@+id/ETEmailOrUsername"
+        android:id="@+id/inputEmail"
         android:layout_width="320dp"
         android:layout_height="52dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/button_layout"
         android:backgroundTint="#FFFFFF"
         android:ems="10"
-        android:hint="   Email/Username"
+        android:hint="   Email"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.439"
@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/TVFullName2" />
 
     <EditText
-        android:id="@+id/ETLoginPassword"
+        android:id="@+id/inputPassword"
         android:layout_width="320dp"
         android:layout_height="52dp"
         android:layout_marginTop="24dp"
@@ -90,7 +90,7 @@
         android:layout_marginEnd="32dp"
         android:text="Forgot Password?"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ETLoginPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/inputPassword" />
 
     <ProgressBar
         android:id="@+id/LoadBar"
@@ -112,6 +112,6 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="60dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/ETLoginPassword" />
+        app:layout_constraintTop_toTopOf="@+id/inputPassword" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

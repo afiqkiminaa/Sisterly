@@ -17,8 +17,6 @@ public class StartActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_start);
 
-        //Set the title
-//        getSupportActionBar().setTitle("SISTERLY APP");
 
         //Open Login Activity
         Button LoginButton = findViewById(R.id.LoginButton);
