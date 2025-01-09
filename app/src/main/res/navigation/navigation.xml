@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/helpline_nav"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.sisterlyapp.HomeFragment"
+        android:label="Home Page"
+        tools:layout = "@layout/activity_home">
+        <action
+            android:id="@+id/toNewsFrag"
+            app:destination="@id/newsFragment" />
+        <action
+            android:id="@+id/toBookFrag"
+            app:destination="@id/bookFragment" />
+        <action
+            android:id="@+id/toReportFrag"
+            app:destination="@id/reportFragment" />
+        <action
+            android:id="@+id/toOrgFrag"
+            app:destination="@id/organisationFragment" />
+        <action
+            android:id="@+id/toSOSFrag"
+            app:destination="@id/SOSFragment" />
+        <action
+            android:id="@+id/toForumFrag"
+            app:destination="@id/forumFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newsFragment"
+        android:name="com.example.sisterlyapp.NewsFragment"
+        android:label="fragment_news"
+        tools:layout="@layout/fragment_news" />
+    <fragment
+        android:id="@+id/bookFragment"
+        android:name="com.example.sisterlyapp.BookingFragment"
+        android:label="fragment_book"
+        tools:layout="@layout/fragment_booking" />
+    <fragment
+        android:id="@+id/forumFragment"
+        android:label="main_forum"
+        tools:layout="@layout/main_forum" />
+    <fragment
+        android:id="@+id/reportFragment"
+        android:name="com.example.sisterlyapp.ReportFragment"
+        android:label="fragment_report"
+        tools:layout="@layout/fragment_report" />
+    <fragment
+        android:id="@+id/organisationFragment"
+        android:label="fragment_organisation"
+        tools:layout="@layout/activity_hotline" />
+    <fragment
+        android:id="@+id/SOSFragment"
+        android:name="com.example.sisterlyapp.SosActivity2"
+        android:label="fragment_sos"
+        tools:layout="@layout/activity_sos" />
+
+</navigation>
