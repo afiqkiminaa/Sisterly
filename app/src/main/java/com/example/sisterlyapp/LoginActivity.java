@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Change the main page when users that already logged in starts the app
         if (preferenceManager.getBoolean(Constants.KEY_IS_SIGNED_IN)) {
-            Intent intent = new Intent(getApplicationContext(), ChatListActivity.class);
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();
         }
