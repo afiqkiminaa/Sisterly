@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CA839C"
+    tools:context=".FragmentSxViolence">
+
+    <TextView
+        android:id="@+id/caption_sxviolence"
+        android:layout_width="411dp"
+        android:layout_height="77dp"
+        android:layout_marginStart="85dp"
+        android:layout_marginBottom="24dp"
+        android:fontFamily="sans-serif-black"
+        android:gravity="center"
+        android:text="Statistics On Sexual Violence in Malaysia"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toTopOf="@+id/picsxviolence"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/picsxviolence"
+        android:layout_width="411dp"
+        android:layout_height="331dp"
+        android:src="@drawable/sexual_violence"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/caption_sxviolence" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
