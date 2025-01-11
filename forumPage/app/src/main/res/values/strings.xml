@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">forumPage</string>
+    <string-array name="usernames">
+        <item>Anisah Azizah</item>
+        <item>KPWKM</item>
+        <item>Ariessa Syahindah</item>
+        <item>Adlin Fyrasha</item>
+    </string-array>
+
+    <string-array name="content">
+        <item>What safety tips do you swear by? Share some on staying safe in different situations to protect ourselves and our sisters.</item>
+        <item>Hentikan Keganasan Terhadap Wanita.</item>
+        <item>Please always be alert in parking lots. Had a bad experience today :(</item>
+        <item>Is it safe for a woman to go solo travelling?</item>
+    </string-array>
+</resources>

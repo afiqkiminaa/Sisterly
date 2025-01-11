@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SISTERLY APP"
 include(":app")
+include(":forumPage")

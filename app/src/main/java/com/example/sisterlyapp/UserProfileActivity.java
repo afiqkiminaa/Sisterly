@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -108,7 +107,7 @@ public class UserProfileActivity extends AppCompatActivity {
 //            Intent intent = new Intent (UserProfileActivity.this, DeleteProfileActivity.class);
 //            startActivity(intent);
 //        }
-         if (id == R.id.menu_log_out) {
+        if (id == R.id.menu_log_out) {
             signOut();
             Intent intent = new Intent(UserProfileActivity.this, StartActivity.class);
 
