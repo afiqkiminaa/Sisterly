@@ -32,32 +32,49 @@
     <fragment
         android:id="@+id/newsFragment"
         android:name="com.example.sisterlyapp.NewsFragment"
-        android:label="fragment_news"
+        android:label="News Portal"
         tools:layout="@layout/fragment_news" />
     <fragment
         android:id="@+id/bookFragment"
         android:name="com.example.sisterlyapp.BookingFragment"
-        android:label="fragment_book"
+        android:label="Appointment Booking"
         tools:layout="@layout/fragment_booking" />
     <fragment
         android:id="@+id/forumFragment"
         android:name="com.example.sisterlyapp.ForumFragment"
-        android:label="main_forum"
+        android:label="Community Forum"
         tools:layout="@layout/main_forum" />
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.example.sisterlyapp.ReportFragment"
-        android:label="fragment_report"
+        android:label="Report Incidents"
         tools:layout="@layout/fragment_report" />
     <fragment
         android:id="@+id/organisationFragment"
         android:name="com.example.sisterlyapp.HotlineActivity"
-        android:label="fragment_organisation"
+        android:label="Hotline"
         tools:layout="@layout/activity_hotline" />
     <fragment
         android:id="@+id/SOSFragment"
         android:name="com.example.sisterlyapp.SosActivity2"
-        android:label="fragment_sos"
+        android:label="SOS Button"
         tools:layout="@layout/activity_sos" />
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.sisterlyapp.HomeActivity"
+        android:label="Home" />
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.example.sisterlyapp.SearchFragment"
+        android:label="Search" />
+    <fragment
+        android:id="@+id/nav_chat"
+        android:name="com.example.sisterlyapp.ChatListFragment"
+        android:label="ChatList" />
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.example.sisterlyapp.UserProfileFragment"
+        android:label="Profile" />
 
 </navigation>

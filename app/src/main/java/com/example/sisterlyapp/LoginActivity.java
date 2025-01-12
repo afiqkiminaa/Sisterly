@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                         preferenceManager.putString(Constants.KEY_USERNAME, documentSnapshot.getString(Constants.KEY_USERNAME));
                         preferenceManager.putString(Constants.KEY_EMAIL, documentSnapshot.getString(Constants.KEY_EMAIL));
                         preferenceManager.putString(Constants.KEY_MOBILE, documentSnapshot.getString(Constants.KEY_MOBILE));
-                        Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     } else {
