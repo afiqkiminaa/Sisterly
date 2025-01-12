@@ -21,10 +21,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
-            android:fontFamily="@font/kaisei_harunoumi_bold"
             android:text="News Portal"
             android:textColor="#F46847"
-            android:textSize="40sp"
+            android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.124"
             app:layout_constraintStart_toStartOf="parent"
@@ -64,17 +63,17 @@
 
         </com.google.android.material.tabs.TabLayout>
 
-        <androidx.fragment.app.FragmentContainerView
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/newsContainer"
-            android:name="com.example.newsportalgroup.FragmentNews"
+            android:name="com.example.sisterlyapp.FragmentNews"
             android:layout_width="405dp"
-            android:layout_height="705dp"
+            android:layout_height="505dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tabmenu" />
+            app:layout_constraintTop_toBottomOf="@+id/tabmenu"
+             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
