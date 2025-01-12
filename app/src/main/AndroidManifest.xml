@@ -41,6 +41,20 @@
             android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".MainActivity" />
 
+        <activity
+            android:name=".ViewAppointmentActivity"
+            android:exported="true" />
+        <activity
+            android:name=".InfoDetailsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".BookingAppointmentActivity"
+            android:exported="true" />
+        <activity
+            android:name=".InitialAppointmentActivity"
+            android:exported="true"/>
+
+
         <service
             android:name=".Firebase.MessagingService"
             android:exported="false">
