@@ -1,15 +1,14 @@
 package com.example.sisterlyapp;
+
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.fragment.app.Fragment;
-
 import android.view.View;
-
 import android.widget.ImageButton;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 public class HomeActivity extends Fragment {
@@ -38,10 +37,27 @@ public class HomeActivity extends Fragment {
         };
         book_button.setOnClickListener(OCLBook);
 
+//        ImageButton report_button = view.findViewById(R.id.report_button);
+//        View.OnClickListener OCLReport = new View.OnClickListener(){
+//            public void onClick(View v){
+//                Navigation.findNavController(view).navigate(R.id.reportFragment);
+//            }
+//        };
+//        report_button.setOnClickListener(OCLReport);
+
+        // ImageButton report_button = view.findViewById(R.id.report_button);
+        // View.OnClickListener OCLReport = new View.OnClickListener(){
+        //     public void onClick(View v){
+        //         Intent intent = new Intent(HomeActivity.this, ReportPage.class);
+        //         startActivity(intent);
+        //     }
+        // };
+        // report_button.setOnClickListener(OCLReport);
         ImageButton report_button = view.findViewById(R.id.report_button);
         View.OnClickListener OCLReport = new View.OnClickListener(){
             public void onClick(View v){
-                Navigation.findNavController(view).navigate(R.id.reportFragment);
+                Intent intent = new Intent(requireActivity(), ReportPage.class);
+                startActivity(intent);
             }
         };
         report_button.setOnClickListener(OCLReport);
