@@ -14,6 +14,24 @@
         <item>Please always be alert in parking lots. Had a bad experience today :(</item>
         <item>Is it safe for a woman to go solo travelling?</item>
     </string-array>
+    <string-array name="publishers">
+        <item>News Straits Time</item>
+        <item>FMT Reporters</item>
+        <item>The Star</item>
+        <item>The Malaysian Reserve</item>
+    </string-array>
+    <string-array name="newscontent">
+        <item>GOMBAK: There has been a significant rise in reports of sexual harassment filed by men, revealed the Women, Family and Community Development Ministry. Minister Datuk Seri Nancy Shukri disclosed that over 1,000 complaints were received from men through the Social Support Centres (PSSS) during the ministry\'s KPWKM.</item>
+        <item>PETALING JAYA: The anti-sexual harassment tribunal has ordered a man in Kuala Lumpur to pay a woman RM60,000 in compensation for subjecting her to visual harassment.</item>
+        <item>PETALING JAYA: The Tribunal for Anti-Sexual Harassment (TAGS) has issued an award for its first complaint involving physical sexual harassment by a male employer towards a female employee, says the Women, Family and Community Development Ministry.</item>
+        <item>REPORTS of sexual harassment are steadily surfacing, revealing a culture where gender-based misconduct is not just prevalent but often overlooked and covered up</item>
+    </string-array>
+    <string-array name="title">
+        <item>Rise in sexual harassment reports by men..</item>
+        <item>Tribunal awards RM60,000 to woman in visual harassment case</item>
+        <item>Tribunal issues landmark award for sexual harassment complaint</item>
+        <item>Sexual harassment: Are we not safe at work?</item>
+    </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

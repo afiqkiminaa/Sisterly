@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    android:background="#FFDEDE"
+    app:cardElevation="4dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/items"
+        android:layout_width="match_parent"
+        android:layout_height="442dp"
+        android:background="#EF4848">
+
+        <!-- User Name -->
+
+        <!-- Post Title -->
+
+        <!-- Post Image -->
+<!--      Post content-->
+
+        <TextView
+            android:id="@+id/newssource"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="News StraitsTime"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.052"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.096"
+            />
+
+        <TextView
+            android:id="@+id/newstitle"
+            android:layout_width="354dp"
+            android:layout_height="68dp"
+            android:fontFamily="@font/abril_fatface"
+            android:text="Rise in sexual harassment reports by men.."
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/newsimage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.41"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.682" />
+
+        <ImageView
+            android:id="@+id/newsimage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/news1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.378"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.562" />
+
+        <TextView
+            android:id="@+id/contentnews"
+            android:layout_width="365dp"
+            android:layout_height="120dp"
+            android:text="GOMBAK: There has been a significant rise in reports of sexual harassment filed by men, revealed the Women, Family and Community Development Ministry. Minister Datuk Seri Nancy Shukri disclosed that over 1,000 complaints were received from men through the Social Support Centres (PSSS) during the ministry's KPWKM@Advocacy Anti-Sexual Harassment Roadshow."
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.533"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
