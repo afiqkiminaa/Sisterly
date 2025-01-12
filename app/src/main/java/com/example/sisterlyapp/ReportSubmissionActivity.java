@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -29,8 +30,12 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.Priority;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -263,29 +268,62 @@ public class ReportSubmissionActivity extends AppCompatActivity implements Image
         }
         
         loadingIndicator.setVisibility(View.VISIBLE);
-        fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(this, location -> {
-                if (location != null) {
-                    currentLocation = location.getLatitude() + "," + location.getLongitude();
-                    try {
-                        currentAddress = Utils.getAddressFromLocation(this,
-                            location.getLatitude(), location.getLongitude());
-                        if (currentAddress != null) {
-                            locationTextView.setText(currentAddress);
-                            locationTextView.setVisibility(View.VISIBLE);
-                        }
 
-                    } catch (IOException e) {
-                        Toast.makeText(this, "Could not get address from location", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(this, "Could not get location", Toast.LENGTH_SHORT).show();
-                }
-                loadingIndicator.setVisibility(View.GONE);
+        LocationRequest locationRequest = LocationRequest.create()
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            .setInterval(10000)
+            .setFastestInterval(5000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest);
+
+        LocationServices.getSettingsClient(this)
+            .checkLocationSettings(builder.build())
+            .addOnSuccessListener(this, locationSettingsResponse -> {
+                fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            currentLocation = location.getLatitude() + "," + location.getLongitude();
+                            Utils.getAddressFromLocation(this,
+                                    location.getLatitude(), location.getLongitude(),
+                                    new Utils.OnAddressReceivedListener() {
+                                        @Override
+                                        public void onAddressReceived(String address) {
+                                            currentAddress = address;
+                                            locationTextView.setText(address);
+                                            locationTextView.setVisibility(View.VISIBLE);
+                                            loadingIndicator.setVisibility(View.GONE);
+                                        }
+
+                                        @Override
+                                        public void onError(String error) {
+                                            Toast.makeText(ReportSubmissionActivity.this,
+                                                    error, Toast.LENGTH_SHORT).show();
+                                            loadingIndicator.setVisibility(View.GONE);
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(this, "Could not get location", Toast.LENGTH_SHORT).show();
+                        }
+                        loadingIndicator.setVisibility(View.GONE);
+                    })
+                    .addOnFailureListener(e -> {
+                        loadingIndicator.setVisibility(View.GONE);
+                        Toast.makeText(this, "Error getting location", Toast.LENGTH_SHORT).show();
+                    });
             })
             .addOnFailureListener(e -> {
                 loadingIndicator.setVisibility(View.GONE);
-                Toast.makeText(this, "Error getting location", Toast.LENGTH_SHORT).show();
+                if (e instanceof ResolvableApiException) {
+                    try {
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(this, 123);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        Toast.makeText(this, "Error getting location settings", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Location settings are not satisfied", Toast.LENGTH_SHORT).show();
+                }
             });
     }
     

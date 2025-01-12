@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,14 +48,78 @@ public class Utils {
     }
 
     // Location related methods
-    public static String getAddressFromLocation(Context context, double latitude, double longitude) throws IOException {
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-        if (addresses != null && !addresses.isEmpty()) {
-            Address address = addresses.get(0);
-            return address.getAddressLine(0);
+    public static void getAddressFromLocation(Context context, double latitude, double longitude, OnAddressReceivedListener listener) {
+        if (context == null || listener == null) {
+            if (listener != null) {
+                listener.onError("Invalid context or listener");
+            }
+            return;
         }
-        return null;
+
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            listener.onError("Invalid latitude or longitude values");
+            return;
+        }
+
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        if (!Geocoder.isPresent()) {
+            listener.onError("Geocoder is not available on this device");
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            try {
+                geocoder.getFromLocation(latitude, longitude, 1, addresses -> {
+                    if (addresses != null && !addresses.isEmpty()) {
+                        Address address = addresses.get(0);
+                        if (address != null) {
+                            String addressLine = address.getAddressLine(0);
+                            if (addressLine != null && !addressLine.isEmpty()) {
+                                listener.onAddressReceived(addressLine);
+                            } else {
+                                listener.onError("Address line is empty");
+                            }
+                        } else {
+                            listener.onError("Could not get address details");
+                        }
+                    } else {
+                        listener.onError("Could not find address for this location");
+                    }
+                });
+            } catch (Exception e) {
+                listener.onError("Error getting address: " + e.getMessage());
+            }
+        } else {
+            try {
+                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+                    Address address = addresses.get(0);
+                    if (address != null) {
+                        String addressLine = address.getAddressLine(0);
+                        if (addressLine != null && !addressLine.isEmpty()) {
+                            listener.onAddressReceived(addressLine);
+                        } else {
+                            listener.onError("Address line is empty");
+                        }
+                    } else {
+                        listener.onError("Could not get address details");
+                    }
+                } else {
+                    listener.onError("Could not find address for this location");
+                }
+            } catch (IOException e) {
+                listener.onError("Error getting address: " + e.getMessage());
+            } catch (IllegalArgumentException e) {
+                listener.onError("Invalid location coordinates");
+            } catch (Exception e) {
+                listener.onError("Unexpected error: " + e.getMessage());
+            }
+        }
+    }
+
+    public interface OnAddressReceivedListener {
+        void onAddressReceived(String address);
+        void onError(String error);
     }
 
     // String related methods

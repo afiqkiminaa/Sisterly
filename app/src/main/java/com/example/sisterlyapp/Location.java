@@ -3,20 +3,20 @@ package com.example.sisterlyapp;
 import java.io.Serializable;
 
 public class Location implements Serializable {
-    private String latitude;
-    private String longitude;
+    private double latitude;
+    private double longitude;
     private String address;
 
     public Location(String latitude, String longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.latitude = Double.parseDouble(latitude);
+        this.longitude = Double.parseDouble(longitude);
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
